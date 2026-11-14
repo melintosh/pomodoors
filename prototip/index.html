@@ -3,206 +3,376 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Eşlik — Oda prototipi</title>
+  <title>PomoDoors</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Crect x='4' y='0' width='3' height='1' fill='%233E672C'/%3E%3Crect x='2' y='1' width='5' height='1' fill='%234E8F3A'/%3E%3Crect x='1' y='2' width='6' height='2' fill='%234E8F3A'/%3E%3Crect x='0' y='4' width='5' height='1' fill='%233E672C'/%3E%3Crect x='0' y='5' width='2' height='2' fill='%233E672C'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,400&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Pixelify+Sans:wght@400..700&display=swap">
   <link rel="stylesheet" href="styles.css">
-  <script src="avatars.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js" defer></script>
+  <script src="characters.js" defer></script>
+  <script src="i18n.js" defer></script>
+  <script src="scene.js" defer></script>
+  <script src="net.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body data-phase="waiting">
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <span class="wordmark">Eşlik</span>
-        <span class="room-name">Ortak oda</span>
+        <span class="wordmark">PomoDoors</span>
+        <button class="room-name" id="roomButton" type="button" aria-haspopup="dialog"></button>
       </div>
       <div class="topbar-actions">
-        <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false" title="Aşama değiştiğinde kısa bir ses çalar">
+        <ul class="stats" id="stats" data-i18n-aria="stats.aria"></ul>
+        <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false" data-i18n-title="sound.title">
           <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/>
             <path class="sound-on" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>
             <path class="sound-off" d="M16 9.5l5 5M21 9.5l-5 5"/>
           </svg>
-          <span>Ses <span id="soundState">kapalı</span></span>
+          <span><span data-i18n="sound.label">Ses</span> <span id="soundState"></span></span>
         </button>
-        <span class="me" id="meAvatar" role="img"></span>
+        <button class="me" id="meAvatar" type="button" aria-expanded="false" data-i18n-aria="me.aria"></button>
       </div>
+      <button class="lang-toggle" id="langToggle" type="button" data-i18n="lang.switch" data-i18n-aria="lang.switchAria">EN</button>
     </div>
   </header>
 
   <p class="phase-banner" id="phaseBanner" role="status" aria-live="polite"></p>
 
-  <main class="room" id="roomView">
-    <section class="stage" aria-labelledby="phaseName">
-      <p class="eyebrow">
-        <span class="eyebrow-dot" aria-hidden="true"></span>
-        <span id="phaseName">Bekleme</span>
-        <span class="eyebrow-detail" id="phaseDetail"></span>
-      </p>
-      <div class="timer" id="timer" role="timer"></div>
-      <p class="stage-meta" id="stageMeta"></p>
-      <div class="progress" id="progress" aria-hidden="true"><span id="progressFill"></span></div>
+  <main class="join" id="joinView" aria-labelledby="joinTitle" hidden>
+    <div class="join-layout">
+      <section class="scene-frame join-preview" data-i18n-aria="join.previewAria">
+        <div class="hud join-preview-hud">
+          <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span><span data-i18n="join.previewTag"></span></p>
+          <p class="live-count" id="liveCount" aria-live="polite"></p>
+        </div>
+        <div class="scene-wrap join-preview-wrap" id="joinSceneWrap">
+          <canvas class="scene join-scene" id="joinScene" width="320" height="192" role="img" data-i18n-aria="join.previewAria"></canvas>
+        </div>
+      </section>
+      <div class="card join-card">
+        <p class="eyebrow" data-i18n="join.eyebrow"></p>
+        <h1 class="join-title" id="joinTitle" data-i18n="join.title"></h1>
+        <p class="join-lede" data-i18n="join.lede"></p>
+        <p class="invite-note" id="inviteNote" hidden></p>
+        <form class="join-form" id="joinForm">
+          <label class="join-label" for="nicknameInput" data-i18n="join.label"></label>
+          <input class="text-input" id="nicknameInput" type="text" maxlength="24" autocomplete="nickname" required data-i18n-placeholder="join.placeholder">
+          <button class="btn btn-primary" id="joinBtn" type="submit" data-i18n="join.button"></button>
+        </form>
+        <p class="fine" data-i18n="join.fine"></p>
+        <p class="fine" data-i18n="join.schedule"></p>
+        <p class="join-error" id="joinError" role="alert" hidden></p>
+      </div>
+    </div>
+  </main>
 
-      <div class="stage-block" data-block="waiting join">
-        <form id="startForm">
-          <div class="field">
-            <label for="intentInput">Bu turda neye odaklanacaksın?</label>
-            <input class="text-input" id="intentInput" type="text" maxlength="80" autocomplete="off" placeholder="ör. Raporun giriş bölümünü yazmak">
-            <p class="hint"><span>İsteğe bağlı · Yalnızca o an odada olanlar görür.</span><span id="intentCount">0/80</span></p>
+  <main class="room" id="roomView" hidden>
+    <div class="room-main">
+      <section class="scene-frame" aria-labelledby="phaseName">
+        <div class="hud">
+          <div class="hud-main">
+            <p class="eyebrow">
+              <span class="eyebrow-dot" aria-hidden="true"></span>
+              <span id="phaseName"></span>
+              <span class="eyebrow-detail" id="phaseDetail"></span>
+            </p>
+            <div class="timer" id="timer" role="timer"></div>
           </div>
-          <fieldset class="durations" id="durations">
-            <legend>Odak süresi</legend>
-            <div class="segmented">
-              <label><input type="radio" name="duration" value="15"><span>15 dk</span></label>
-              <label><input type="radio" name="duration" value="25" checked><span>25 dk</span></label>
-              <label><input type="radio" name="duration" value="45"><span>45 dk</span></label>
+          <p class="stage-meta" id="stageMeta"></p>
+        </div>
+        <div class="progress" id="progress" aria-hidden="true"><span id="progressFill"></span></div>
+        <div class="scene-wrap" id="sceneWrap">
+          <canvas class="scene" id="scene" width="320" height="192" tabindex="0" role="img" data-i18n-aria="scene.aria"></canvas>
+          <div class="scene-labels" id="sceneLabels" aria-hidden="true"></div>
+          <section class="scene-chat" id="chatPanel" aria-labelledby="chatTitle">
+            <div class="chat-head">
+              <h2 id="chatTitle" data-i18n="chat.title"></h2>
+              <span class="chat-state" id="chatState"></span>
+              <span class="chat-unread" id="chatUnread" hidden></span>
+              <button class="chat-toggle" id="chatToggle" type="button" aria-expanded="true" aria-controls="chatBody"></button>
             </div>
-            <p class="hint">Ardından her zaman 5 dakika mola.</p>
-          </fieldset>
-          <div class="form-actions">
-            <button class="btn btn-primary" id="startBtn" type="submit">Turu başlat</button>
-            <p class="fine" id="startNote">Odadaki herkes turu başlatabilir. Başlayan tur herkes için birlikte ilerler.</p>
+            <div class="chat-body" id="chatBody">
+              <ol class="feed" id="messages" aria-live="polite"></ol>
+              <p class="chat-locked" id="chatLocked"></p>
+              <form class="composer" id="composer">
+                <label class="visually-hidden" for="msgInput" data-i18n="chat.msgLabel"></label>
+                <input class="text-input" id="msgInput" type="text" maxlength="280" autocomplete="off" disabled>
+                <button class="btn btn-primary btn-small" id="sendBtn" type="submit" data-i18n="chat.send" disabled></button>
+              </form>
+            </div>
+          </section>
+        </div>
+        <div class="scene-foot">
+          <div class="hotbar-row">
+            <div class="hotbar-wrap" id="hotbarWrap">
+              <div class="hotbar" id="hotbar" role="group" data-i18n-aria="hotbar.aria"></div>
+              <span class="hotbar-selected" id="hotbarSelected"></span>
+            </div>
+            <div class="scene-tools">
+              <div class="emotes" id="emotes" role="group" data-i18n-aria="emote.aria">
+                <button class="emote" type="button" data-emote="wave"><span class="emote-icon" aria-hidden="true"></span><span data-i18n="emote.wave"></span></button>
+                <button class="emote" type="button" data-emote="heart"><span class="emote-icon" aria-hidden="true"></span><span data-i18n="emote.heart"></span></button>
+                <button class="emote" type="button" data-emote="coffee"><span class="emote-icon" aria-hidden="true"></span><span data-i18n="emote.coffee"></span></button>
+              </div>
+              <label class="ambient"><span data-i18n="ambient.label"></span>
+                <select id="ambientSelect">
+                  <option value="off" data-i18n="ambient.off"></option>
+                  <option value="rain" data-i18n="ambient.rain"></option>
+                  <option value="birds" data-i18n="ambient.birds"></option>
+                  <option value="fire" data-i18n="ambient.fire"></option>
+                </select>
+              </label>
+            </div>
           </div>
-        </form>
-      </div>
-
-      <div class="stage-block" data-block="focus" hidden>
-        <p class="label">Niyetin</p>
-        <p class="intent-text" id="myIntent"></p>
-        <p class="late-note" id="lateNote" hidden>Sonradan katıldın; turun kalan süresine dahilsin.</p>
-        <div class="stage-actions">
-          <button class="btn btn-quiet" id="leaveBtn" type="button">Turdan ayrıl</button>
-          <p class="fine">Yalnızca senin katılımın biter; oda zamanlayıcısı devam eder.</p>
+          <div class="scene-hints">
+            <p class="scene-hint" id="sceneHint" role="status" aria-live="polite"></p>
+            <p class="scene-caption" id="gardenCaption"></p>
+          </div>
         </div>
-      </div>
-
-      <div class="stage-block" data-block="left" hidden>
-        <!-- Durum illüstrasyonu: aralık kapı -->
-        <svg class="illus illus-left" viewBox="0 0 64 54" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 48h46"/>
-          <path d="M16 48V8h22v40"/>
-          <path d="M16 8l11 3v38l-11-1"/>
-          <circle cx="24" cy="30" r="1" fill="currentColor" stroke="none"/>
-          <path class="illus-accent" d="M43 28h11M50 24l4 4-4 4"/>
-        </svg>
-        <p class="label">Turdan ayrıldın</p>
-        <p class="intent-text" id="leftSummary"></p>
-        <p class="fine">Oda turu herkes için sürüyor. Mola başladığında sohbet açılır.</p>
-        <div class="stage-actions">
-          <button class="btn btn-quiet" id="rejoinBtn" type="button">Tura geri dön</button>
-        </div>
-      </div>
-
-      <div class="stage-block" data-block="break" hidden>
-        <article class="card" id="summaryCard">
-          <p class="label">Bu turun özeti</p>
-          <p class="summary-line" id="summaryLine"></p>
-          <p class="summary-intent" id="summaryIntent"></p>
-        </article>
-        <div class="break-note">
-          <!-- Durum illüstrasyonu: buharı tüten fincan -->
-          <svg class="illus" viewBox="0 0 56 48" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 21h24v7.5A10.5 10.5 0 0 1 25.5 39h-3A10.5 10.5 0 0 1 12 28.5z"/>
-            <path d="M36 24h2.5a4.5 4.5 0 0 1 0 9H35"/>
-            <path d="M8 43h32"/>
-            <path class="illus-accent" d="M19 16c-1.8-2.2 1.8-3.8 0-6.5M25 16c-1.8-2.2 1.8-3.8 0-6.5M31 16c-1.8-2.2 1.8-3.8 0-6.5"/>
-          </svg>
-          <p class="fine" id="breakNote"></p>
-        </div>
-      </div>
-    </section>
-
-    <aside class="side" aria-label="Katılımcılar ve sohbet">
-      <section aria-labelledby="peopleTitle">
-        <div class="section-head">
-          <h2 id="peopleTitle">Odadakiler</h2>
-          <span class="count" id="peopleCount"></span>
-        </div>
-        <ul class="people-list" id="peopleList"></ul>
       </section>
 
-      <section class="chat card" aria-labelledby="chatTitle">
-        <div class="section-head">
-          <h2 id="chatTitle">Sohbet</h2>
-          <span class="chat-state" id="chatState">Kapalı</span>
+      <section class="stage stage-dock card" data-i18n-aria="stage.aria">
+
+        <div class="stage-block" data-block="focus" hidden>
+          <div class="focus-dock">
+            <div class="focus-dock-text">
+              <p class="label" data-i18n="focus.intentLabel"></p>
+              <p class="intent-text" id="myIntent"></p>
+              <p class="late-note" id="lateNote" data-i18n="focus.late" hidden></p>
+            </div>
+            <div class="stage-actions">
+              <button class="btn btn-quiet btn-small" id="leaveBtn" type="button" data-i18n="focus.leave"></button>
+              <p class="fine" data-i18n="focus.leaveNote"></p>
+            </div>
+          </div>
         </div>
-        <div class="chat-locked" id="chatLocked">
-          <!-- Durum illüstrasyonu: kilitli konuşma balonu -->
-          <svg class="illus" viewBox="0 0 72 54" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 8h34a7 7 0 0 1 7 7v13a7 7 0 0 1-7 7H27l-9 8v-8h-6a7 7 0 0 1-7-7V15a7 7 0 0 1 7-7z"/>
-            <path d="M15 18h22M15 25h14" opacity=".55"/>
-            <g class="illus-accent">
-              <rect class="illus-surface" x="46" y="30" width="18" height="14" rx="3"/>
-              <path d="M50.5 30v-3.5a4.5 4.5 0 0 1 9 0V30"/>
-              <path d="M55 35.5v3"/>
-            </g>
-          </svg>
-          <p class="locked-title" id="lockedTitle"></p>
-          <p class="locked-text" id="lockedText"></p>
+
+        <div class="stage-block" data-block="left" hidden>
+          <div class="focus-dock">
+            <div class="focus-dock-text">
+              <p class="label" data-i18n="left.label"></p>
+              <p class="intent-text" id="leftSummary"></p>
+              <p class="fine" data-i18n="left.note"></p>
+            </div>
+            <div class="stage-actions">
+              <button class="btn btn-quiet btn-small" id="rejoinBtn" type="button" data-i18n="left.rejoin"></button>
+            </div>
+          </div>
         </div>
-        <ol class="messages" id="messages" hidden></ol>
-        <form class="composer" id="composer">
-          <label class="visually-hidden" for="msgInput">Mesaj</label>
-          <input class="text-input" id="msgInput" type="text" maxlength="280" autocomplete="off" disabled>
-          <button class="btn btn-primary btn-small" id="sendBtn" type="submit" disabled>Gönder</button>
-        </form>
+
+        <div class="stage-block" data-block="break" hidden>
+          <article class="summary-ribbon" id="summaryCard">
+            <p class="label" data-i18n="summary.label"></p>
+            <p class="summary-line" id="summaryLine"></p>
+            <ul class="summary-reward" id="summaryReward"></ul>
+            <p class="summary-intent" id="summaryIntent"></p>
+          </article>
+          <div class="break-note">
+            <svg class="illus" viewBox="0 0 56 48" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 21h24v7.5A10.5 10.5 0 0 1 25.5 39h-3A10.5 10.5 0 0 1 12 28.5z"/>
+              <path d="M36 24h2.5a4.5 4.5 0 0 1 0 9H35"/>
+              <path d="M8 43h32"/>
+              <path class="illus-accent" d="M19 16c-1.8-2.2 1.8-3.8 0-6.5M25 16c-1.8-2.2 1.8-3.8 0-6.5M31 16c-1.8-2.2 1.8-3.8 0-6.5"/>
+            </svg>
+            <p class="fine" id="breakNote"></p>
+          </div>
+        </div>
+
+        <div class="stage-block" data-block="join break" hidden>
+          <form id="startForm">
+            <div class="field">
+              <div class="field-head">
+                <label for="intentInput" id="intentLabel"></label>
+                <span class="hint-count" id="intentCount">0/80</span>
+              </div>
+              <div class="intent-row">
+                <input class="text-input" id="intentInput" type="text" maxlength="80" autocomplete="off" data-i18n-placeholder="intent.placeholder">
+                <button class="btn btn-primary" id="startBtn" type="submit"></button>
+              </div>
+              <div class="intent-meta-row">
+                <div class="intent-chips" id="intentPresets" role="group" data-i18n-aria="intent.presetsLabel"></div>
+                <p class="fine" id="startNote"></p>
+              </div>
+            </div>
+            <label class="toggle" id="autoJoinRow"><input type="checkbox" id="autoJoin" checked><span id="autoJoinText"></span></label>
+          </form>
+        </div>
       </section>
+    </div>
+
+    <aside class="side" data-i18n-aria="side.aria">
+      <div class="side-tabs" id="sideTabs" role="tablist" data-i18n-aria="tab.aria">
+        <button class="side-tab" type="button" role="tab" data-tab="people" aria-selected="true">
+          <span class="side-tab-label" data-i18n="tab.people"></span>
+          <span class="side-tab-badge" id="peopleTabBadge"></span>
+        </button>
+        <button class="side-tab" type="button" role="tab" data-tab="garden" aria-selected="false">
+          <span class="side-tab-label" data-i18n="tab.garden"></span>
+        </button>
+        <button class="side-tab" type="button" role="tab" data-tab="cabin" aria-selected="false">
+          <span class="side-tab-label" data-i18n="tab.cabin"></span>
+        </button>
+        <button class="side-tab" type="button" role="tab" data-tab="board" aria-selected="false">
+          <span class="side-tab-label" data-i18n="tab.board"></span>
+        </button>
+        <button class="side-tab" type="button" role="tab" data-tab="history" aria-selected="false">
+          <span class="side-tab-label" data-i18n="tab.history"></span>
+        </button>
+      </div>
+
+      <div class="side-panes">
+        <section class="side-pane" data-tab-pane="people" aria-labelledby="peopleTitle">
+          <div class="section-head">
+            <h2 id="peopleTitle" data-i18n="people.title"></h2>
+            <span class="count" id="peopleCount"></span>
+          </div>
+          <ul class="people-list" id="peopleList"></ul>
+        </section>
+
+        <div class="side-pane side-pane-stack" data-tab-pane="garden" hidden>
+          <section class="seeds" id="seedsSection" aria-labelledby="seedsTitle">
+            <div class="section-head">
+              <h2 id="seedsTitle" data-i18n="seeds.title"></h2>
+            </div>
+            <fieldset class="seed-fieldset">
+              <legend class="visually-hidden" data-i18n="seeds.select"></legend>
+              <ul class="seed-list" id="seedList"></ul>
+            </fieldset>
+            <p class="fine" data-i18n="seeds.fine"></p>
+          </section>
+
+          <section class="herbarium" id="herbSection" aria-labelledby="herbTitle">
+            <div class="section-head">
+              <h2 id="herbTitle" data-i18n="herb.title"></h2>
+              <span class="count" id="herbCount"></span>
+            </div>
+            <ul class="herb-grid" id="herbList"></ul>
+            <div class="herb-rare-wrap" id="rareHerbWrap" hidden>
+              <h3 class="herb-rare-title" data-i18n="herb.rareTitle"></h3>
+              <ul class="herb-grid" id="rareHerbList"></ul>
+            </div>
+            <p class="fine" data-i18n="herb.fine"></p>
+          </section>
+        </div>
+
+        <section class="side-pane cabin" id="cabinSection" data-tab-pane="cabin" aria-labelledby="cabinTitle" hidden>
+          <div class="section-head">
+            <h2 id="cabinTitle" data-i18n="cabin.title"></h2>
+          </div>
+          <ul class="cabin-list" id="cabinList"></ul>
+          <p class="fine" data-i18n="cabin.fine"></p>
+        </section>
+
+        <section class="side-pane board" id="boardSection" data-tab-pane="board" aria-labelledby="boardTitle" hidden>
+          <div class="section-head">
+            <h2 id="boardTitle" data-i18n="board.title"></h2>
+            <span class="count" data-i18n="board.reset"></span>
+          </div>
+          <p class="season-line" id="seasonLine"></p>
+          <div class="wish">
+            <p class="wish-text" id="wishText"></p>
+            <div class="wish-bar" aria-hidden="true"><span id="wishFill"></span></div>
+          </div>
+          <p class="communal" id="communalText"></p>
+          <p class="tree-text" id="treeText"></p>
+          <h3 class="board-sub" data-i18n="leader.title"></h3>
+          <ol class="leader-list" id="leaderList"></ol>
+          <h3 class="board-sub" data-i18n="companions.title"></h3>
+          <ul class="companion-list" id="companionList"></ul>
+          <p class="fine" data-i18n="board.fine"></p>
+        </section>
+
+        <section class="side-pane history" id="historySection" data-tab-pane="history" aria-labelledby="historyTitle" hidden>
+          <div class="section-head">
+            <h2 id="historyTitle" data-i18n="history.title"></h2>
+            <span class="count" id="historyCount"></span>
+          </div>
+          <p class="history-empty" id="historyEmpty" data-i18n="history.empty"></p>
+          <ul class="history-list" id="historyList"></ul>
+          <p class="fine" data-i18n="history.fine"></p>
+        </section>
+      </div>
     </aside>
   </main>
 
   <main class="profile" id="profileView" aria-labelledby="profileTitle" hidden>
-    <p class="eyebrow">Profil</p>
-    <h1 class="profile-title" id="profileTitle">Avatarını seç</h1>
-    <p class="profile-lede">Odadakiler seni bu avatarla görür. Dilediğin zaman değiştirebilirsin.</p>
+    <p class="eyebrow" data-i18n="profile.eyebrow"></p>
+    <h1 class="profile-title" id="profileTitle" data-i18n="profile.title"></h1>
+    <p class="profile-lede" data-i18n="profile.lede"></p>
     <div class="profile-layout">
-      <fieldset class="avatar-picker">
-        <legend class="visually-hidden">Avatar seçenekleri</legend>
-        <div class="avatar-grid" id="avatarGrid"></div>
-      </fieldset>
+      <div class="look-editor" id="lookEditor"></div>
       <aside class="card profile-preview" aria-labelledby="profilePreviewTitle">
-        <p class="label" id="profilePreviewTitle">Odada böyle görünürsün</p>
+        <p class="label" id="profilePreviewTitle" data-i18n="profile.preview"></p>
+        <div class="look-big avatar-pixel" id="lookBig" aria-hidden="true"></div>
         <ul class="people-list" id="profilePreview"></ul>
-        <p class="fine" id="avatarLabel"></p>
       </aside>
     </div>
+    <section class="card game-settings" aria-labelledby="gameSettingsTitle">
+      <h2 class="settings-title" id="gameSettingsTitle" data-i18n="settings.title"></h2>
+      <p class="fine" data-i18n="settings.fine"></p>
+      <div class="toggle-list">
+        <label class="toggle"><input type="checkbox" data-game="garden" checked><span data-i18n="settings.garden"></span></label>
+        <label class="toggle"><input type="checkbox" data-game="xp" checked><span data-i18n="settings.xp"></span></label>
+        <label class="toggle"><input type="checkbox" data-game="streak" checked><span data-i18n="settings.streak"></span></label>
+        <label class="toggle"><input type="checkbox" data-game="board" checked><span data-i18n="settings.board"></span><small data-i18n="settings.boardNote"></small></label>
+      </div>
+    </section>
     <div class="form-actions">
-      <button class="btn btn-primary" id="profileDone" type="button">Odaya dön</button>
+      <button class="btn btn-primary" id="profileDone" type="button" data-i18n="profile.done"></button>
     </div>
   </main>
 
+  <dialog class="sheet rooms-sheet" id="roomsDialog" aria-labelledby="roomsTitle">
+    <h2 id="roomsTitle" data-i18n="doors.title"></h2>
+    <div class="door-list" id="roomsDoorList"></div>
+    <div class="share-row" id="shareRow" hidden>
+      <p class="fine" data-i18n="host.shareNote"></p>
+      <button class="btn btn-quiet btn-small" id="copyLink" type="button" data-i18n="host.copy"></button>
+    </div>
+    <form class="host-form" id="hostForm">
+      <label for="hostName" data-i18n="host.label"></label>
+      <div class="host-row">
+        <input class="text-input" id="hostName" type="text" maxlength="40" autocomplete="off" required data-i18n-placeholder="host.placeholder">
+        <button class="btn btn-primary btn-small" type="submit" data-i18n="host.create"></button>
+      </div>
+      <p class="fine" data-i18n="host.fine"></p>
+    </form>
+    <div class="sheet-actions">
+      <button class="btn btn-quiet" id="roomsClose" type="button" data-i18n="doors.close"></button>
+    </div>
+  </dialog>
+
+  <dialog class="sheet tour" id="tourDialog" aria-labelledby="tourTitle">
+    <p class="label" id="tourStep"></p>
+    <h2 id="tourTitle"></h2>
+    <p id="tourText"></p>
+    <div class="sheet-actions">
+      <button class="btn btn-quiet" id="tourSkip" type="button" data-i18n="tour.skip"></button>
+      <button class="btn btn-primary" id="tourNext" type="button"></button>
+    </div>
+  </dialog>
+
   <dialog class="sheet" id="leaveDialog" aria-labelledby="leaveTitle">
     <form method="dialog">
-      <h2 id="leaveTitle">Turdan ayrılmak istiyor musun?</h2>
-      <p>Şimdiye kadarki <strong id="leaveMinutes"></strong> odak süren kaydedilir. Oda zamanlayıcısı herkes için devam eder.</p>
+      <h2 id="leaveTitle" data-i18n="leave.title"></h2>
+      <p><span data-i18n="leave.bodyA"></span> <strong id="leaveMinutes"></strong> <span data-i18n="leave.bodyB"></span></p>
       <div class="sheet-actions">
-        <button class="btn btn-quiet" value="stay">Vazgeç</button>
-        <button class="btn btn-primary" value="leave">Turdan ayrıl</button>
+        <button class="btn btn-quiet" value="stay" data-i18n="leave.stay"></button>
+        <button class="btn btn-primary" value="leave" data-i18n="leave.leave"></button>
       </div>
     </form>
   </dialog>
 
-  <!-- Geçici önizleme kontrolü: ürün arayüzünün parçası değil. -->
-  <div class="preview" id="preview" role="region" aria-label="Prototip önizleme kontrolü">
-    <span class="preview-tag">Prototip önizleme</span>
-    <div class="preview-body" id="previewBody">
-      <div class="preview-group" role="group" aria-label="Oda durumu">
-        <button type="button" data-goto="waiting">Bekleme</button>
-        <button type="button" data-goto="focus">Odak</button>
-        <button type="button" data-goto="break">Mola</button>
-        <button type="button" data-next title="Aşamanın sonuna ileri sarar">Sonraki aşama →</button>
-      </div>
-      <div class="preview-group" role="group" aria-label="Odaya sonradan giriş">
-        <span>Odaya gir:</span>
-        <button type="button" data-arrive="focus">Odak sürerken</button>
-        <button type="button" data-arrive="break">Molada</button>
-      </div>
-      <div class="preview-group">
-        <button type="button" data-open="profile" aria-pressed="false">Profil / avatar seçimi</button>
-      </div>
-    </div>
-    <button type="button" id="previewToggle" aria-expanded="true" aria-controls="previewBody">Gizle</button>
+  <!-- Test modu: yalnızca odada dev_mode açıkken görünür; ürün arayüzünün parçası değil. Pilot öncesi kapatılır. -->
+  <div class="devbar" id="devBar" role="group" data-i18n-aria="dev.label" hidden>
+    <span class="devbar-label" data-i18n="dev.label"></span>
+    <button type="button" data-timing="1500,300" data-i18n="dev.real"></button>
+    <button type="button" data-timing="180,60">3 + 1 dk</button>
+    <button type="button" data-timing="60,30">1 dk + 30 sn</button>
+    <button type="button" data-timing="30,20">30 + 20 sn</button>
   </div>
 </body>
 </html>

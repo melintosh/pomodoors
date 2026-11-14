@@ -1,16 +1,20 @@
-# Pomodoors
+# PomoDoors
 
-Başlaması zor gelen işler için sakin ve yargılamayan bir ortak çalışma web uygulaması. Kullanıcı kısa bir niyet yazar, süresini seçer ve kamerasız bir odada başkalarıyla aynı anda çalışır. Odak sırasında sohbet kapalıdır, molada açılır.
-
-> **Durum:** Bu depoda yalnızca statik bir arayüz prototipi var (`prototip/`). Backend, üyelik, veritabanı, gerçek zamanlı eşzamanlama ve veri kaydı **henüz yok**. Teknoloji yığını seçilmedi.
+> Bu dal, Eşlik ürününün oyunlaştırılmış bir varyantıdır. Oda, tur ve sohbet kuralları Eşlik ile aynıdır; üzerine büyüyen bir bahçe, XP ve seviye, Yaprak, seri ve ortak bahçe eklenir. Görsel dil özgün, sıcak bir piksel sanattır.
 >
-> "Pomodoors" bir çalışma adıdır, kesinleşmedi. Olası adres: `eslik.melintosh.com`.
+> **Slogan:** Pomodoro, ama birlikte · *Pomodoro, but together.* **Konumlandırma:** Çalışırken bahçen büyür. Arayüz Türkçe ve İngilizce.
+
+Başlaması zor gelen işler için sakin ve yargılamayan bir ortak çalışma web uygulaması. Kullanıcı kısa bir niyet yazar, süresini seçer ve kamerasız bir odada başkalarıyla aynı anda çalışır. Odakta geçen dakikalar kişinin kendi bahçesini büyütür. Odak sırasında sohbet kapalıdır, molada açılır.
+
+> **Durum:** `prototip/` artık Supabase'e bağlı çalışan bir web uygulaması: takma adla giriş (arka planda anonim oturum), tek ortak oda, sunucuda uygulanan tur ve sohbet kuralları, kalıcı profil ve bahçe, saat ayarlı oda (her :00 ve :30'da tur), gerçek zamanlı katılımcılar, molada paylaşılan konumlar ve tepkiler, piksel karakterler, tohum çeşitleri, ortak ağaç, gerçek saate bağlı gün döngüsü, ilk giriş turu, ortam sesi, Türkçe ve İngilizce arayüz. Yayında: https://fek114.github.io/pomodoors/ (pilot).
+>
+> "PomoDoors" bir çalışma adıdır, kesinleşmedi.
 
 Bu belge, projede çalışan kişiler ile ürün ve kod ajanları için temel bağlam kaynağıdır. Bir değişikliğe başlamadan önce baştan sona okuyun ve [Ajan yönergeleri](#ajan-yönergeleri) bölümüne uyun.
 
 ## Ürün özeti ve hedef kullanıcı
 
-**Eşlik nedir?** Body doubling (başka birinin varlığında çalışma) fikrinden yola çıkan, Pomodoro düzeninde ortak bir çalışma odası. Odadaki herkes aynı turu paylaşır: Bekleme → Odak → Mola. Katılımcılar birbirini kamera yerine avatar, görünen ad, kısa niyet ve durum üzerinden görür.
+**PomoDoors nedir?** Body doubling (başka birinin varlığında çalışma) fikrinden yola çıkan, Pomodoro düzeninde ortak bir çalışma odası. Her odak turu kişinin bahçesine katkı olarak döner. Odadaki herkes aynı turu paylaşır: Bekleme → Odak → Mola. Katılımcılar birbirini kamera yerine avatar, görünen ad, kısa niyet ve durum üzerinden görür.
 
 **Hedef:** Kendi kullanımımız ve bir portfolyo vaka çalışması için birkaç hafta içinde test edilebilir bir MVP. İlk sürüm küçük, davetli bir pilot grupla denenecek.
 
@@ -26,85 +30,138 @@ Bu belge, projede çalışan kişiler ile ürün ve kod ajanları için temel ba
 
 - Bazı işlerde en zor adım başlamaktır. İş büyük, belirsiz ya da sıkıcı göründüğünde ertelenir.
 - Yalnız çalışırken dikkat kolay dağılır, zaman algısı kayar.
-- Var olan birlikte çalışma seçenekleri çoğu zaman kamera, konuşma ya da görünür olma baskısı taşır. Verimlilik uygulamaları ise puan, seri ve kıyaslamayla ek baskı kurabilir.
+- Var olan birlikte çalışma seçenekleri çoğu zaman kamera, konuşma ya da görünür olma baskısı taşır. Verimlilik uygulamalarındaki puan, seri ve kıyaslama çoğu zaman cezalandırıcı kurulur: seri bozulunca her şey sıfırlanır, geride kalan kişi utandırılır.
 
 **Vaat**
 
-> Kısa bir niyet yaz, süreni seç, başkalarıyla sessizce çalış.
+> Kısa bir niyet yaz, süreni seç, başkalarıyla sessizce çalış, bahçen büyüsün.
 
-Kamera yok, yarış yok, suçluluk yok. Eşlik başlamayı kolaylaştırmayı, birilerinin de çalıştığını hissettirmeyi ve molayı gerçekten mola yapmayı amaçlar. Tıbbi ya da terapötik bir etki iddiası taşımaz.
+Kamera yok, suçluluk yok. PomoDoors başlamayı kolaylaştırmayı, birilerinin de çalıştığını hissettirmeyi ve molayı gerçekten mola yapmayı amaçlar. Oyun öğeleri cezalandırmak için değil, eşlik etmek için vardır. Tıbbi ya da terapötik bir etki iddiası taşımaz.
 
 ## Ürün ilkeleri
 
 - **ADHD dostu.** Az adım, az karar. Hazır varsayılanlar var (25 dk odak, 5 dk mola). Kalan süre ve bir sonraki aşamanın saati hep görünür. Aşama değişimleri belirgindir. Dikkat dağıtan öğeler en aza indirilir.
-- **Düşük baskı.** Niyet isteğe bağlıdır. Tura geç katılmak ya da erken ayrılmak normaldir, cezalandırılmaz. Hiçbir şey "kaçırılmış" gibi sunulmaz.
+- **Düşük baskı.** Niyet isteğe bağlıdır. Tura geç katılmak ya da erken ayrılmak normaldir, cezalandırılmaz. Hiçbir şey "kaçırılmış" gibi sunulmaz. Oyun öğeleri de bu kurala uyar: kazanılan bir şey geri alınmaz.
 - **Kamera gerektirmez.** Görüntü ve ses yok. Kişinin varlığı avatar, görünen ad, niyet ve durumla gösterilir.
-- **Minimal / editorial.** Yumuşak nötr zemin, net tipografi (serif başlıklar, sans gövde metni), tek ve ölçülü vurgu rengi, bol boşluk. Görsel zenginlik süslemeyle değil, avatarlar ve küçük durum illüstrasyonlarıyla sağlanır.
-- **Yargılamayan dil.** "Başarısız", "kaçırdın", "yine mi" gibi ifadeler kullanılmaz. Özetler yalnızca olanı aktarır: "8 dk odak · sonradan katıldı". Puan, seri, sıralama ve kullanıcılar arası kıyaslama yoktur.
+- **Sıcak piksel sanat.** Özgün piksel sanat: sıcak toprak ve bitki tonları, ahşap ve kâğıt dokulu paneller, mevsim ve gün döngüsü hissi. Piksel yazı tipi yalnızca başlıklarda ve kısa etiketlerde kullanılır; gövde metni okunaklı bir sans ile yazılır. Ekran kalabalıklaşmaz, boşluk korunur. Var olan bir oyunun çizimleri, karakterleri, arayüz parçaları ya da yazı tipi kopyalanmaz.
+- **Yargılamayan dil.** "Başarısız", "kaçırdın", "yine mi" gibi ifadeler kullanılmaz. Özetler yalnızca olanı aktarır: "8 dk odak · sonradan katıldı". Oyun öğeleri de aynı sakinlikle anlatılır: "Bahçene 3 filiz eklendi" denir, "Serini kaybettin" denmez.
 - **Erişilebilir.** Durumlar yalnızca renkle değil, metin ve ikonla da anlatılır. Arayüz klavyeyle kullanılabilir. Hareket azaltma tercihine uyulur. Sesli uyarı isteğe bağlıdır ve varsayılan olarak kapalıdır.
 
-## Güncel statik prototip
+## Oyunlaştırma
 
-`prototip/` klasöründe tek sayfalık bir HTML/CSS/JS prototipi var. Amacı oda deneyimini ve görsel dili denemek.
+Oyun öğeleri kişiye eşlik etmek için var; baskı kurmak, cezalandırmak ya da utandırmak için değil. Aşağıdakiler ürün varsayılanlarıdır; açık kalan ayrıntılar [Açık kararlar](#açık-kararlar) bölümündedir.
+
+### Bahçe sahnesi
+
+- Oda, yukarıdan bakan 2B piksel bir bahçe sahnesidir. Her katılımcı sahnede bir karakterdir.
+- Odakta sahne sakindir: karakterler kendi tarhlarında çalışır, bitkiler dakikalar geçtikçe büyür. Turdan ayrılan kişi evin önünde soluk görünür. Dolaşmak kapalıdır.
+- Bekleme ve molada kullanıcı kendi karakteriyle dolaşabilir (ok tuşları, WASD ya da dokunarak) ve boş tarhlara tohum ekebilir. Molada sohbet mesajları karakterlerin üstünde, aynı anda tek balon olacak şekilde sırayla görünür.
+
+### Büyüyen bahçe
+
+- Her kullanıcının kendine ait bir bahçesi vardır. Odakta geçen dakikalar bahçeye katkı olarak döner: tohum ekilir, filizlenir, büyür.
+- Katkı, gerçekten katılınan odak süresinden hesaplanır; alt sınır yoktur. Sonradan katılmak ya da erken ayrılmak da katkı sayılır.
+- Bitkiler kurumaz, solmaz, ölmez. Uzun süre gelmeyen biri bahçesini bıraktığı gibi bulur.
+
+### XP, seviye ve para birimi
+
+- XP yalnızca odak dakikalarından gelir. Molada, sohbette ya da odada bekleyerek XP kazanılmaz; böylece mola gerçekten mola kalır.
+- XP birikince seviye artar. Seviye hiçbir koşulda düşmez.
+- Oyun içi para birimiyle bahçe için tohum, süs ve avatar aksesuarı alınır. Gerçek parayla satın alınmaz.
+- Kazanılan XP, seviye, para ve eşyalar geri alınmaz.
+
+### Seri
+
+- Arka arkaya en az bir odak turuna katılınan günleri sayar.
+- Haftada iki dinlenme günü seriyi bozmaz.
+- Seri bozulursa kayıp mesajı, uyarı ya da kırmızı gösterge çıkmaz; sayaç sessizce yeniden başlar. En uzun seri kişinin geçmişinde kalır.
+- Seri hiçbir ödülün şartı değildir. "Serin bozulmak üzere" gibi hatırlatmalar gönderilmez.
+
+### Ortak bahçe ve liderlik tablosu
+
+- Ortak bahçe, odadakilerin bu hafta birlikte topladığı odak dakikalarını gösterir: "Bu hafta odadakiler birlikte 340 dk odaklandı."
+- **Liderlik tablosu (ürün kararı):** "Bu hafta en çok odaklananlar" başlığıyla haftalık ilk 10 kişi, sıra numarası ve dakikasıyla herkese görünür. Kullanıcı ilk 10'da değilse yalnızca kendi süresini görür ("Sen: 45 dk"). "Geride kaldın" gibi ifadeler ve alt sıra vurgusu yoktur. Her pazartesi sıfırlanır; "Ortak bahçe" ayarıyla ekrandan gizlenebilir.
+- **Bu hafta birlikte çalıştıkların:** aynı turlarda çalıştığın kişiler ve tur sayısı (en fazla 5 kişi).
+
+### Odalar ve canlı sayaç
+
+- Herkes tek ana meydan olan **Ortak bahçeye** (`ortak`) girer. Bahçe içinde 4 fiziksel **portal kapı** bulunur: **Ders** (sıcak kütüphane), **Kod** (gece atölyesi), **İş** (çalışma salonu) ve **Hobi** (cam sera).
+- Katılımcılar liste yerine doğrudan oyun içinden bu kapılara yürüyerek ya da dokunarak ilgili evrene geçer; her evrenin kendi turu, sohbeti ve o an içerideki katılımcıları vardır. Alt kapıdan tekrar Ortak bahçeye dönülür.
+- Giriş ekranında bahçeden canlı bir önizleme ve "Şu an N kişi çalışıyor" canlı sayacı görünür; bahçedeki her portal kapının üstünde de o kapıdaki canlı kişi sayısı gösterilir (lobi kanalı, presence).
+- **Ev sahibi odası:** herkes kendi odasını açıp linkini paylaşabilir (`?oda=r-xxxxxxxx`); bu odalar herkese açık listede görünmez. Kişi başı en fazla 3 oda. Her odanın kendi turu, sohbeti, ortak ağacı ve tur kayıtları vardır.
+
+### Saat ayarlı oda
+
+- Oda duvar saatine bağlıdır: her saat başı ve buçukta 25 dk odak başlar, :25'te 5 dk mola. Bekleme aşaması ve elle tur başlatma yoktur; süre seçimi (15/45) kaldırıldı.
+- Odaya odak sırasında giren "Kalan süreye katıl" der. Molada sıradaki tur için niyet yazılır; "turuna beni de kat" seçiliyse (varsayılan) tur başlar başlamaz otomatik katılınır.
+- Aşama sunucu saatinden hesaplanır (`room_slot`, `room_phase`); sohbet, tohum ekme ve katılım kuralları buna göre uygulanır.
+- **Test modu:** pilot için kapalı (`rooms.dev_mode = false`, süreler 1500 + 300 sn). Yeniden test gerekirse bir odada `dev_mode` açılır; sayfanın altında test çubuğu görünür ve süreler o oda için kısaltılabilir. Test bitince tekrar kapatılır.
+
+### Tepkiler, ortak ağaç ve gün döngüsü
+
+- Bekleme ve molada karakterin üstünde kısa piksel tepkiler: el sallama, kalp, kahve. Odakta kapalıdır.
+- Sahnedeki ortak ağaç odanın haftalık toplam dakikasıyla büyür: 0, 60, 200, 500, 1000 ve 2000 dk'da altı aşama; son aşamada çiçek açar. Her pazartesi yeniden başlar.
+- Sahne kullanıcının yerel saatine göre sabah, gündüz, gün batımı, akşam ve gece renklerine geçer; akşam ve gece evin pencereleri yanar. Açık/koyu temadan bağımsızdır.
+
+### Hasat, herbaryum, mevsimler ve açılan yerler
+
+- **Çekirdek döngü:** odaklan → bahçe büyür → molada hasat et → Yaprak ve koleksiyon → yeni tohum → odaklan.
+- **Hasat:** molada olgun bitkiye dokununca (ya da üstündeyken E) hasat edilir; tarh boşalır, çeşide göre Yaprak kazanılır (papatya 3, lale 8, havuç 10, ayçiçeği 14, çilek 18, mevsim tohumları 12). İsteğe bağlıdır; hiçbir bitki kendiliğinden kaybolmaz.
+- **Herbaryum:** hasat edilen her çeşit bir kart olarak koleksiyona girer ve kaç kez yetiştirildiği yazar (9 çeşit + hasatta şansa bağlı +5 Yaprak bonuslu nadir çeşit keşifleri). Bulunmayan nadir çeşitler eksik olarak gösterilmez; tamamlama baskısı yoktur.
+- **Haftalık mevsim:** her pazartesi (İstanbul) sırayla sonbahar, kış, ilkbahar, yaz. Sahnenin çim ve ağaç renkleri değişir, kışın kar yağar. Her mevsimin yalnızca o hafta alınabilen bir tohumu vardır: kabak, kardelen, gelincik, lavanta (25 Yaprak). Keseye alınan tohum sonra da ekilebilir.
+- **Açılan yerler ve haftanın dileği:** ortak ağaç odanın haftalık süresiyle büyüdükçe haritada yeni yerler açılır: meydan (60 dk), çeşme (200), sera (500), fener festivali (1000), çiçek tarlası (2000). "Haftanın dileği" sıradaki yeri ve kalan dakikayı gösterir. Her pazartesi yeniden başlar.
+- **Evin içi ve kişisel kulübe dekorasyonu:** molada ve beklemede evin yeşil kapısından kişisel bir çalışma köşesine girilir (kitaplık, şömine, masa, yatak). Kullanıcı Yapraklarla kulübe eşyaları alabilir (bitki çayı tepsisi, sıcak fener, pencere kedisi, sarkan sarmaşık, pikap, okuma minderi); alınan eşyalar evin içinde canlı detaylarla görünür. İçerideyken diğerleri görünmez; odak başlayınca bahçeye dönülür.
+
+### Tohum çeşitleri
+
+- Papatya ücretsizdir; lale 15, havuç 20, ayçiçeği 30, çilek 40 Yaprak. Satın alınan tohum kesede durur; molada boş tarha seçilen tohum ekilir.
+- İlk üç büyüme aşaması bütün çeşitlerde aynıdır; olgun hali çeşide göre değişir. Harcama gönüllüdür; hiçbir şey kendiliğinden eksilmez.
+
+### Karakter, ilk giriş turu ve ortam sesi
+
+- Sahnede, listede, sohbette ve profilde aynı piksel karakter. Ten, saç rengi, saç stili (kısa, uzun, bere) ve kıyafet rengi seçilir.
+- İlk girişte üç adımlık, atlanabilir bir tur gösterilir.
+- İsteğe bağlı ortam sesi (yağmur, kuşlar, şömine) tarayıcıda üretilir; varsayılan kapalıdır.
+
+### Prototip varsayılanları
+
+- 1 dk odak = 1 XP = 1 Yaprak. Para biriminin adı Yaprak.
+- Her seviye 100 XP. Her yeni seviyede bahçede bir boş tarh açılır.
+- Odakta geçen her 5 dk bahçede bir bitkiyi bir adım büyütür: boş tarh → tohum → filiz → genç bitki → çiçek.
+- Seri, günün ilk odak katkısıyla sessizce artar; en fazla iki günlük ara seriyi bozmaz.
+- Molada boş tarha tohum ekmek ücretsizdir.
+- Piksel sanat 16×16 ızgarada çizilir (simgeler 8×8). Başlık yazı tipi Pixelify Sans, gövde Inter.
+
+### Hepsi gizlenebilir
+
+- Her oyun öğesi ayarlardan ayrı ayrı gizlenebilir. Tümünü kapatan kullanıcı sade bir ortak çalışma odası görür.
+
+## Güncel prototip
+
+`prototip/` klasöründe Supabase'e bağlı, tek sayfalık bir HTML/CSS/JS uygulaması var.
 
 ### Kapsadıkları
 
-- **Oda ekranı:** Bekleme, Odak ve Mola halleri.
-  - **Bekleme:** isteğe bağlı niyet alanı (80 karakter), 15 / 25 / 45 dk seçimi (25 seçili gelir), "Turu başlat".
+- **Oda ekranı:** Bekleme, Odak ve Mola halleri; üstte ahşap gösterge (aşama, zamanlayıcı), altında 2B piksel bahçe sahnesi.
   - **Odak:** ortak geri sayım, ilerleme çizgisi, molanın başlayacağı saat, katılımcılar ve niyetleri, kapalı sohbet. "Turdan ayrıl" önce onay ister; ayrılan kişi "Tura geri dön" diyebilir. İptal düğmesi yok.
   - **Odak sürerken giriş:** "Kalan süreye katıl". Kayıt katılınan andan başlar; ortak zamanlayıcı değişmez.
   - **Mola:** 5 dk geri sayım ve herkese açık sohbet. Kişisel tur özeti yalnızca önceki tura katılmış kullanıcıya gösterilir.
 - **Aşama geçişleri:** ekranda kısa bir bildirim ve isteğe bağlı ses (varsayılan kapalı).
 - **Katılımcı listesi:** avatar, ad, niyet ve durum ("Beklemede", "Odakta", "Molada", "Turdan ayrıldı", "Henüz katılmadı"). Durumlar metin ve ikonla gösterilir.
-- **Profil / avatar seçimi:** 8 özgün SVG avatar. Seçim başlıkta, katılımcı listesinde ve sohbette hemen görünür.
+- **Profil / karakter düzenleyici:** ten, saç rengi, saç stili ve kıyafet; seçim her yerde hemen görünür.
+- **Giriş:** tek alan, "Takma adın" ve yanında bahçeden canlı piksel görünüm (gün döngüsü, mevsim ve bahçe sakinleriyle). Arka planda Supabase anonim oturumu açılır; profil ve bahçe o tarayıcıda hatırlanır.
+- **Sohbet paneli:** sahnenin sağ üstünde, oyunlardaki gibi yarı saydam bir panel (telefonda sahnenin altında). Mesajların yanında odaya gelenler, ayrılanlar, tepkiler ve aşama değişimleri kısa satırlar olarak akar. Molada Enter ile yazılır, Esc ile sahneye dönülür; panel küçültülebilir ve küçükken yeni mesaj sayısını gösterir. Mesaj göndermek yalnızca molada açıktır.
+- **Gerçek zamanlı oda:** kimin odada olduğu (presence), molada karakter konumları ve tepkiler (broadcast), tur başlangıcı ve yeni mesajlar (veritabanı değişiklikleri).
+- **Niyet başlangıçları ve oturum defteri:** odak niyeti alanının altında tek tıkla doldurulan hazır başlangıç çipleri bulunur; sağ sütundaki "Oturum defterin" kartında ise yalnızca kullanıcının kendisine görünen tamamlanmış odak turları listelenir (`my_history`).
+- **İki dil:** üst bardaki TR / EN düğmesi. Tüm metinler `i18n.js` içinde.
 - **Görünüm:** masaüstü ve mobil genişliklere uyum, açık ve koyu tema.
-- **Geçici önizleme kontrolü:** sayfanın altındaki koyu, kesik çizgili çubuk. Ürün arayüzünün parçası değildir, yalnızca halleri incelemek için vardır.
 
 ### Henüz yapmadıkları
 
-- Backend, API ve veritabanı yok.
-- Üyelik, giriş ve oturum yönetimi yok. Kullanıcı her zaman "Sen".
-- Gerçek zamanlı eşzamanlama yok. Diğer katılımcılar, niyetleri ve mesajları sahte; zamanlayıcı yalnızca tarayıcıda çalışır.
-- Veri kaydı yok. Sayfa yenilenince her şey başa döner.
-- Sohbet kuralı yalnızca arayüzde uygulanıyor; sunucu tarafında denetim yok.
-- Görev listesi, ödül sistemi ve oturum/görev geçmişi yok.
-- Giriş, oda önü, geçmiş ve ayarlar ekranları yok.
+- Kalıcı hesap yok. Tarayıcı verisi silinirse ya da cihaz değişirse profil taşınmaz.
+- Çok adımlı kişisel görev listesi henüz yok.
 - Otomatik test yok.
 
-## Genişletilmiş MVP kapsamı
-
-### 1. E-posta ile üyelik ve basit profil
-
-- Küçük, davetli bir pilot için e-posta ile üyelik.
-- Profilde görünen ad ve avatar bulunur.
-
-### 2. Görsel avatar galerisi ve profil avatarı seçimi
-
-- Aynı görsel dilde çizilmiş, özgün ve hazır illüstratif avatarlar.
-- Kullanıcı galeriden birini seçer. Seçim odada, katılımcı listesinde ve sohbette görünür.
-
-### 3. Ortak Bekleme / Odak / Mola odası
-
-MVP'de davetli pilot için tek bir ortak oda olacak. Bu kurallar kararlaştırıldı:
-
-- Oda her an tek bir senkron turdadır: Bekleme → Odak → Mola → Bekleme.
-- Varsayılan 25 dk odak, 5 dk mola. Turu başlatan kişi 15, 25 ya da 45 dk seçebilir; mola her zaman 5 dk.
-- Beklemede odadaki herkes tur başlatabilir. İki istek aynı anda gelirse ilk kabul edilen başlatır.
-- Tur başladıktan sonra katılan kişi kalan süreye dahil olur. Odaya girmek zamanlayıcıyı sıfırlamaz.
-- Ortak tur iptal edilmez. Kullanıcı yalnızca kendi katılımını bitirebilir; çıkması zamanlayıcıyı etkilemez.
-- Mola bitince oda beklemeye geçer. Yeni tur kendiliğinden başlamaz.
-- Niyet kişisel ve isteğe bağlıdır. O an odada bulunanlara görünür ve yeni tura taşınmaz.
-- Aşama değişimleri ekranda belirgin gösterilir. Sesli uyarı isteğe bağlıdır, varsayılanı kapalıdır.
-- Her kullanıcıya yalnızca gerçekten katıldığı odak süresi kaydedilir; alt sınır yoktur. Özet örnekleri:
-  - "25 dk odak · turun sonuna kadar kaldın"
-  - "8 dk odak · sonradan katıldı"
-  - "12 dk odak · turdan ayrıldı"
-- Kişisel tur özeti yalnızca o tura katılmış kullanıcıya gösterilir.
-
-### 4. Yalnızca molada açık sohbet
-
-- Sohbet yalnızca oda moladayken açıktır. Bekleme ve Odak'ta herkes için kapalıdır.
-- Molada odaya ilk kez giren kullanıcı da yazabilir.
 - Kural hem arayüzde hem sunucuda uygulanmalı. Sunucu mesajı kendi saatine ve odanın o anki aşamasına göre kabul eder ya da reddeder. Reddedilen mesajın metni kullanıcının ekranından silinmez.
 
 ### 5. Kişisel görev listesi
@@ -112,24 +169,45 @@ MVP'de davetli pilot için tek bir ortak oda olacak. Bu kurallar kararlaştırı
 - Kullanıcı görevlerini küçük görevlere ya da ilk adımlara ayırabilir.
 - Gelişmiş görev yönetimi (projeler, etiketler, öncelik, son tarih, paylaşım) kapsam dışıdır.
 
-### 6. Küçük görevler için hafif ödül
+### 6. Oyun öğeleri
 
-- Tamamlanan küçük görevler, örneğin bir avatar aksesuarı gibi kozmetik bir şeyin açılmasını sağlayabilir.
-- Sınırlar: puan ya da para birimi yok, seri şartı yok, kazanılan şey kaybedilmez, kimseyle kıyaslanmaz.
-- Ayrıntılar ayrıca tasarlanacak. Statik prototipe bağlanmadı.
+- Büyüyen bahçe, XP ve seviye, Yaprak, seri, ortak bahçe ve tepkiler.
+- Kurallar ve sınırlar [Oyunlaştırma](#oyunlaştırma) bölümündedir.
+- Prototipte Supabase'e bağlı çalışır; ödüller sunucuda hesaplanır.
 
 ### 7. Kişisel oturum ve görev geçmişi
 
 - Kullanıcı kendi geçmiş oturumlarını (tarih, süre, niyet, özet) ve tamamladığı görevleri görür.
 - Geçmiş yalnızca kullanıcının kendisine görünür.
 
+### Sonraki yapılacaklar (Yol haritası)
+
+Bu liste bir sonraki geliştirme oturumunda kalınan yerden devam edebilmek için tutulur.
+
+#### Canlı test ve doğrulama (mola döngüsü + portal akışı)
+
+- [ ] **Mola fazında portal geçişleri:** `:25–:30` mola aralığında (veya `dev_mode = true` kısa turda) 4 portal kapısının (`ders`, `kod`, `work`, `hobby`) her birine yürüyerek/dokunarak `E` basmadan otomatik geçiş ve alt kapıdan `Ortak bahçe` dönüşü canlı test edilecek.
+- [ ] **Kulübe içi ve dekorasyon:** Yeşil ev kapısından içeri girip Yaprak ile satın alınan 6 eşyanın (`tea`, `lantern`, `cat`, `plant`, `turntable`, `cushion`) sahnede ve animasyonlarıyla (`prefers-reduced-motion` kapalıyken) doğru göründüğü doğrulanacak.
+- [ ] **Hasat ve nadir çeşit:** Mola fazında çiçeklenmiş bitki hasat edilip ~%22 şansla nadir çeşit (`10..18`, `+5` bonus Yaprak) ve Herbaryum `Nadir keşifler` kartı canlı test edilecek.
+- [ ] **Oturum defterin:** Tamamlanan bir odak turunun ardından `my_history` çıktısının sağ sütunda (`historySection`) güncellendiği doğrulanacak.
+
+#### Aşama 3 — Yapılacak özellikler
+
+- [ ] **Kişisel görev listesi (mikro adımlar):** Odak öncesi/molada büyük bir işi 2–3 küçük adıma bölmeyi sağlayan hafif görev listesi ve seçili adımı doğrudan tur niyetine (`#intentInput`) aktarma. (Proje, öncelik, son tarih ve paylaşım kapsam dışı.)
+- [ ] **Mobil sahne kontrolü:** Küçük/dokunmatik ekranlarda bahçede yürümeyi ve kapılara girmeyi kolaylaştıran hafif yön/dokunma geri bildirimleri.
+- [ ] **Çok kullanıcılı portal presence:** Giriş ekranındaki ve kapı üstlerindeki canlı kişi sayılarının farklı odalar arasında geçiş yaparken gecikmesiz güncellenmesinin uçtan uca sınanması.
+
+#### Altyapı, güvenlik ve kalite
+
+- [ ] **RLS sertleştirmesi:** `profiles` güncelleme politikasında istemcinin doğrudan `leaves`, `xp`, `streak`, `garden`, `cabin_items` sütunlarını değiştirmesini engelleyen trigger/policy eklenmesi (şu an iş kuralları `SECURITY DEFINER` RPC'lerde).
+- [ ] **Otomatik E2E test:** Giriş -> odak -> mola -> hasat -> portal geçişi -> kulübe satın alma akışları için Playwright veya benzeri tarayıcı test paketi.
+- [ ] **Kalıcı hesap kararı:** Pilot sonrası anonim oturuma e-posta / sihirli bağlantı eklenip eklenmeyeceği (bkz. [Açık kararlar](#açık-kararlar)).
+
 ## Sonraki sürümlere bırakılanlar
 
 - Kamera ve ses
 - Yabancılarla eşleştirme
 - Herkese açık oda keşfi ve çoklu oda
-- Liderlik tablosu
-- Seri (streak) baskısı
 - Mobil uygulama. Varsayım: MVP mobil tarayıcıda kullanılabilir olacak.
 - Gelişmiş analitik
 - Tarayıcı bildirimleri
@@ -138,10 +216,14 @@ MVP'de davetli pilot için tek bir ortak oda olacak. Bu kurallar kararlaştırı
 
 Bu konular henüz karara bağlanmadı. İlgili bir değişiklikten önce sorun:
 
-- E-posta ile giriş yöntemi: tek kullanımlık bağlantı mı, parola mı?
-- Teknoloji yığını ve barındırma: backend, gerçek zamanlı katman, veritabanı.
+- Pilot sonrası kalıcı hesap: anonim oturuma e-posta bağlamak gerekecek mi? (Pilotta yalnızca takma ad.)
+- Ön yüzün yayınlanacağı yer ve alan adı. Veritabanı ve gerçek zamanlı katman: Supabase, Frankfurt.
 - Görev listesi ile tur niyeti arasındaki bağ: niyet bir görevden seçilebilecek mi?
-- Ödül sisteminin kuralları, görünümü ve avatar aksesuarlarıyla ilişkisi.
+- Tohum fiyatları pilotta değişsin mi? Süs ve aksesuar mağazası olacak mı?
+- XP eğrisi pilotta sabit 100 XP olarak kalsın mı?
+- Tamamlanan küçük görevler de XP ya da para kazandırsın mı? Kazandırırsa "XP yalnızca odaktan gelir" kuralı değişir.
+- Bahçe odadaki diğer kişilere görünsün mü?
+- Saat ayarlı odanın yanında serbest süreli (15/45 dk) ikinci bir oda olacak mı?
 - Avatar galerisine fotoğraf yükleme eklenip eklenmeyeceği. Şu anki yön yalnızca hazır avatarlar.
 - Pilot ölçeği: aynı anda kaç kişi?
 - Ürün adı ve alan adı.
@@ -152,55 +234,49 @@ Bu konular henüz karara bağlanmadı. İlgili bir değişiklikten önce sorun:
 .
 ├── README.md          # bu belge
 └── prototip/
-    ├── index.html     # oda ve profil görünümleri, önizleme kontrolü
+    ├── index.html     # giriş, oda ve profil görünümleri
     ├── styles.css     # tasarım belirteçleri (:root), açık/koyu tema
-    ├── avatars.js     # SVG avatar seti
-    └── app.js         # sahte veri, aşama mantığı, etkileşimler
+    ├── characters.js  # piksel karakterler ve portreler
+    ├── i18n.js        # Türkçe ve İngilizce metinler
+    ├── scene.js       # bahçe sahnesi: canvas, karolar, karakterler, tepkiler
+    ├── net.js         # Supabase bağlantısı: oturum, oda, presence, broadcast
+    └── app.js         # aşama akışı, arayüz, etkileşimler
 ```
 
 ## Kurulum ve prototipi açma
 
-Kurulum, paket yükleme ya da derleme adımı yok.
+Kurulum, paket yükleme ya da derleme adımı yok. Supabase istemcisi (supabase-js 2.118.0) CDN'den yüklenir; veritabanı Supabase'te (Frankfurt) hazırdır.
 
-1. Prototipi doğrudan tarayıcıda açın. macOS'te depo kökünden:
-
-   ```sh
-   open prototip/index.html
-   ```
-
-   Diğer sistemlerde `prototip/index.html` dosyasına çift tıklayın.
-
-2. İsterseniz yerel bir sunucuyla açın, sonra <http://localhost:8000> adresine gidin:
+1. Yerel bir sunucuyla açın, sonra <http://localhost:8000> adresine gidin:
 
    ```sh
    python3 -m http.server 8000 --directory prototip
    ```
 
-3. Yazı tipleri (Newsreader, Inter) Google Fonts'tan yüklenir. Çevrimdışıyken sistem yazı tipleri kullanılır, sayfa yine çalışır.
+2. Takma adınızı yazıp odaya girin. İkinci bir kullanıcıyla denemek için aynı sayfayı <http://127.0.0.1:8000> adresinden açın; farklı adres ayrı tarayıcı deposu kullanır.
 
-### Önizleme kontrolü
+3. Yazı tipleri (Pixelify Sans, Inter) Google Fonts'tan yüklenir. Çevrimdışıyken sistem yazı tipleri kullanılır.
 
-| Kontrol | Ne yapar |
-| --- | --- |
-| Bekleme / Odak / Mola | Odayı o hale getirir. Odak, turun 7. dakikasından açılır. Mola, önceki tura baştan sona katılmış gibi açılır. |
-| Sonraki aşama → | Aktif aşamanın sonuna ileri sarar. Özetlerdeki süreler gerçek katılımdan hesaplanır. |
-| Odaya gir: Odak sürerken | Odaya odak sürerken ilk kez girmiş olursun ve "Kalan süreye katıl" akışını denersin. |
-| Odaya gir: Molada | Odaya molada ilk kez girmiş olursun. Sohbet açıktır, tur özeti gösterilmez. |
-| Profil / avatar seçimi | Avatar seçme görünümünü açar. |
-| Gizle / Göster | Çubuğu küçültür ya da açar. |
+### Sunucu tarafı
+
+- Tablolar: `profiles` (ek olarak `cabin_items`), `rooms` (`ortak`, `ders`, `kod`, `work`, `hobby` + ev sahibi odaları), `participations`, `messages`. RLS açık; ödül ve satın alma kuralları `SECURITY DEFINER` fonksiyonlarda çalışır.
+- Fonksiyonlar: `room_slot`, `room_phase`, `set_room_timing` (yalnızca test modunda), `create_room`, `week_leaderboard`, `week_companions`, `current_season`, `harvest` (nadir çeşit + bonus Yaprak dahil), `buy_cabin_item`, `cabin_item_price`, `my_history`, `join_turn`, `leave_turn`, `claim_reward`, `buy_seed`, `plant_seed`, `room_week_minutes`.
+- Yayın: `.github/workflows/pages.yml` ön yüzü (`prototip/`) `main` dalına her push'ta GitHub Pages'e çıkarır.
+- Bahçe sakinleri: Fatih ve Melis sahnede her zaman bulunan iki karakterdir; gerçek kullanıcı değiller, katılımcı listesinde görünmezler.
+- Ücretsiz Supabase projeleri bir hafta hiç kullanılmazsa duraklatılır; panelden tek tıkla yeniden açılır, veri silinmez.
 
 ## Ajan yönergeleri
 
 1. **Önce bu README'yi oku.** Ürün kurallarını ve kapsamı buradan al. Kodla README arasında çelişki görürsen sor.
-2. **Türkçe ürün metinlerini koru.** Arayüz metinleri Türkçe ve yargılamayan bir tonla yazıldı. Gerekçesiz yeniden yazma ya da çeviri yapma; değişiklik gerekiyorsa öner.
+2. **Metinleri iki dilde ve aynı tonda tut.** Arayüz metinleri `prototip/i18n.js` içinde Türkçe ve İngilizce, yargılamayan bir tonla yazıldı. Yeni metni iki dilde ekle; gerekçesiz yeniden yazma, değişiklik gerekiyorsa öner.
 3. **Kapsamı büyütmeden önce sor.** Yukarıdaki MVP listesinde olmayan bir özellik, ekran, bağımlılık ya da servis eklemeden önce onay al. [Açık kararlar](#açık-kararlar) bölümündeki konularda kendi başına karar verme.
 4. **ADHD için tıbbi etki iddiası yazma.** "Tedavi eder", "odaklanmayı garanti eder", "bilimsel olarak kanıtlanmış" gibi ifadeler kullanma. "Kolaylaştırmayı amaçlar" gibi ölçülü ifadeler kullan.
-5. **Puan, seri ya da liderlik yarışı ekleme.** Kullanıcılar arası kıyaslama, sıralama ya da seri sayacı olmayacak. Ödüller kozmetik ve baskısız kalacak.
-6. **Gerçek backend veya auth varmış gibi davranma.** Prototipteki veriler sahte. Olmayan altyapıyı kodda, metinde ya da raporlarda varmış gibi anlatma. Bir şeyi doğrulamadıysan bunu açıkça söyle.
-7. **Her değişikliği küçük ve incelenebilir tut.** Bir seferde tek bir konu üzerinde çalış. Neyi neden değiştirdiğini kısaca yaz.
+5. **Oyun öğelerini [Oyunlaştırma](#oyunlaştırma) bölümündeki sınırlar içinde tut.** Kazanılanı geri alan, seri bozulunca kayıp gösteren, alt sıraları vurgulayan, oyun öğelerini zorunlu kılan ya da gerçek parayla satın alma isteyen bir şey ekleme. Liderlik tablosu bir ürün kararıdır; dilini sakin tut, kıyaslayan ya da utandıran metin yazma.
+6. **Kuralları sunucuda tut, olmayanı var gibi anlatma.** Tur, ödül, sohbet ve tohum kuralları Supabase fonksiyonlarında ve RLS'te. Bir kuralı yalnızca istemciye taşıma. E-posta girişi ya da yayın gibi henüz olmayan altyapıyı varmış gibi anlatma. Bir şeyi doğrulamadıysan bunu açıkça söyle.
+7. **Her değişikliği küçük ve incelenebilir tut.** Bir seferde tek bir konu üzerinde çalış. Her parçayı uygulamadan önce neyi neden değiştireceğini kısaca yazıp onaya sun.
 
 Ayrıca:
 
+- Görseller özgün piksel sanat olmalı. Var olan bir oyunun çizimlerini, karakterlerini, arayüz parçalarını ya da yazı tipini kopyalama.
 - Durumları yalnızca renkle anlatma; metin ya da ikon ekle.
-- Önizleme kontrolünü ürün arayüzünün parçası gibi tasarlama.
 - Renkler ve yazı tipleri `prototip/styles.css` başındaki `:root` belirteçlerinde. Yeni renk eklemeden önce mevcut belirteçleri kullan.
